@@ -17,7 +17,7 @@ pipeline {
       steps {
         sh '''
           if [ ! -d venv ]; then
-            py -m venv venv
+            python3 -m venv venv
           fi
           . venv/bin/activate
           pip install -r requirements.txt
