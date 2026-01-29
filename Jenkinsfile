@@ -13,6 +13,14 @@ pipeline {
       }
     }
 
+    stage('Check python version') {
+        steps {
+            sh '''
+            python3 --version
+            '''
+        }
+    }
+
     stage('Setup venv') {
       steps {
         sh '''
