@@ -46,16 +46,7 @@ pipeline {
       steps {
         sh '''
           . venv/bin/activate
-          pytest -v
-        '''
-      }
-    }
-
-    stage('Generate report') {
-      steps {
-        sh '''
-          . venv/bin/activate
-          pytest --html=reports/report.html --self-contained-html
+          pytest -v --html=reports/report.html --self-contained-html
         '''
       }
     }
