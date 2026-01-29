@@ -17,10 +17,9 @@ pipeline {
       steps {
         sh '''
           if [ ! -d venv ]; then
-            python3 -m venv venv
+            py -m venv venv
           fi
           . venv/bin/activate
-          pip install --upgrade pip
           pip install -r requirements.txt
         '''
       }
@@ -43,12 +42,20 @@ pipeline {
         '''
       }
     }
+
+    stage('Generate report') {
+      steps {
+        sh '''
+          . venv/bin/activate
+          pytest --html=reports/report.html --self-contained-html
+        '''
+      }
+    }
   }
 
   post {
     always {
-      archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
-      junit 'test-results/*.xml'
+      archiveArtifacts artifacts: 'reports/**', allowEmptyArchive: true
     }
   }
 }
