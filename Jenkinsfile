@@ -27,8 +27,8 @@ pipeline {
           if [ ! -d venv ]; then
             python3 -m venv venv
           fi
-          . venv/bin/activate
-          pip install -r requirements.txt
+          venv/bin/pip install --upgrade pip
+          venv/bin/pip install -r requirements.txt
         '''
       }
     }
@@ -36,8 +36,7 @@ pipeline {
     stage('Install Playwright') {
       steps {
         sh '''
-          . venv/bin/activate
-          playwright install chromium
+          venv/bin/playwright install chromium
         '''
       }
     }
@@ -45,8 +44,7 @@ pipeline {
     stage('Run tests') {
       steps {
         sh '''
-          . venv/bin/activate
-          pytest -v --html=reports/report.html --self-contained-html
+          venv/bin/pytest -v --html=reports/report.html --self-contained-html
         '''
       }
     }
