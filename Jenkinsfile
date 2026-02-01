@@ -45,7 +45,7 @@ pipeline {
     stage('Run tests') {
       steps {
         sh '''
-          venv/bin/pytest -v --html=reports/report.html --self-contained-html
+          venv/bin/pytest -v --html=reports/report.html --self-contained-html --css=assets/pytest_html.css
         '''
       }
     }
