@@ -24,9 +24,10 @@ pipeline {
     stage('Setup venv') {
       steps {
         sh '''
-          if [ ! -d venv ]; then
-            python3 -m venv venv
-          fi
+          set -e
+          rm -rf venv
+          python3 -m venv venv
+          ls venv/bin
           venv/bin/pip install --upgrade pip
           venv/bin/pip install -r requirements.txt
         '''
