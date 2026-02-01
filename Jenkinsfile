@@ -58,11 +58,6 @@ pipeline {
   post {
     always {
       archiveArtifacts artifacts: 'reports/**', allowEmptyArchive: true
-      publishHTML([
-        reportDir: 'reports',
-        reportFiles: 'report.html',
-        reportName: 'Playwright Test Report'
-    ])
     }
   }
 }
