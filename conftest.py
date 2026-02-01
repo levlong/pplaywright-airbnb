@@ -80,7 +80,7 @@ def pytest_runtest_makereport(item, call):
 
         extra = getattr(report, "extra", [])
         extra.append(extras.image(relative_path))
-        report.extra = extra
+        report.extras = extra
 
 def pytest_html_report_title(report):
     report.title = "Airbnb Automation UI test"
