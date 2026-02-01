@@ -4,4 +4,7 @@ components/__pycache__
 pages/__pycache__
 reports/screenshots/
 report/logs/
+reports/report.html
+reports/assets/
 tests/__pycache__
+__pycache__
