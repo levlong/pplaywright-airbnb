@@ -49,7 +49,7 @@ pipeline {
     stage('Run tests') {
       steps {
         sh '''
-          venv/bin/pytest -v --html=reports/report.html --self-contained-html --css=assets/pytest_html.css
+          venv/bin/pytest -v --html=reports/report.html --self-contained-html
         '''
       }
     }
@@ -58,6 +58,11 @@ pipeline {
   post {
     always {
       archiveArtifacts artifacts: 'reports/**', allowEmptyArchive: true
+      publishHTML([
+        reportDir: 'reports',
+        reportFiles: 'report.html',
+        reportName: 'Playwright Test Report'
+    ])
     }
   }
 }

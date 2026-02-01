@@ -1,6 +1,8 @@
 from components.nav_component import NavComponent
 
 def test_nav_home(page):
+    """Nav bar: click Home tab và verify text
+    """
     nav = NavComponent(page)
 
     nav.goto("https://www.airbnb.com", "open_home")
@@ -8,4 +10,4 @@ def test_nav_home(page):
     nav.expect_visible(nav.AIRBNB_LOGO, "logo_visible")
 
     nav.click_home_tab()
-    nav.expect_contains_text(nav.HOME_TAB, "vc", "home_tab_text")
+    nav.expect_contains_text(nav.HOME_TAB, "Homes", "home_tab_text")
