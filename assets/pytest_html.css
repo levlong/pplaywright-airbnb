@@ -1,0 +1,41 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto;
+}
+
+table {
+  font-size: 14px;
+}
+
+.extra img {
+  max-width: 900px;
+  border: 1px solid #ddd;
+  margin-top: 10px;
+}
+
+/* ===== Environment table ===== */
+#environment {
+    width: 60%;
+    margin-bottom: 30px;
+}
+
+#environment table {
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+#environment th {
+    background: #1f2937;
+    color: #fff;
+    padding: 8px;
+    text-align: left;
+}
+
+#environment td {
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+
+#environment tr:nth-child(even) {
+    background-color: #f3f4f6;
+}
+
