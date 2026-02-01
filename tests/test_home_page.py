@@ -5,3 +5,6 @@ def test_homepage_nav(page):
     home.goto("https://www.airbnb.com")
     home.nav.click_logo()
     home.nav.click_experience_tab()
+
+def test_on_push_action(page):
+    pass
