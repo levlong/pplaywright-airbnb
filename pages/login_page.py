@@ -1,4 +1,5 @@
 from pages.base_page import BasePage
+from components.side_bar_component import SideBarComponent
 
 class LoginPage(BasePage):
 
@@ -9,29 +10,29 @@ class LoginPage(BasePage):
     LOGIN_BTN = { "role": "button", "name":"Sign in" }
 
     def verify_logo_visible(self):
-        self.expect_visible(**self.LOGO, action_name="nav_logo_visible")
+        self.expect_visible(action_name="nav_logo_visible", **self.LOGO)
         return self
 
     def click_logo(self):
-        self.click(**self.LOGO, action_name="click_logo")
+        self.click(action_name="click_logo", **self.LOGO)
         return self
     
     def click_user_name(self):
-        self.click(**self.USERNAME, action_name="click_user_name")
+        self.click(action_name="click_user_name", **self.USERNAME)
         return self
     
     def enter_user_name(self, username):
-        self.fill(username, **self.USERNAME, action_name="fill_user_name")
+        self.fill(username, action_name="fill_user_name", **self.USERNAME)
     
     def click_password(self):
-        self.click(**self.PASSWORD, action_name="click_password")
+        self.click(action_name="click_password", **self.PASSWORD)
         return self
     
     def enter_password(self, password):
-        self.fill(password, **self.PASSWORD, action_name="fill_password")
+        self.fill(password, action_name="fill_password", **self.PASSWORD)
     
     def click_login(self):
-        self.click(**self.LOGIN_BTN, action_name="click_login")
+        self.click(action_name="click_login", **self.LOGIN_BTN)
         return self
     
     def login(self, username, password):
@@ -40,4 +41,5 @@ class LoginPage(BasePage):
         self.click_password()
         self.enter_password(password)
         self.click_login()
+        return SideBarComponent(self.page)
         
