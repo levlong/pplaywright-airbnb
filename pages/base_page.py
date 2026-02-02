@@ -16,14 +16,6 @@ class BasePage:
         :param page: Playwright Page instance
         """
         self.page = page
-
-    def _locator(self, selector):
-        """
-        Tạo locator từ selector.
-
-        :param selector: selector (xpath / css / text)
-        """
-        return self.page.locator(selector)
     
     def el(self, value=None, **kwargs) -> Locator:
         # Neu selector la xpath
@@ -71,6 +63,7 @@ class BasePage:
         except Exception as e:
             self._fail_action(name)
             raise e
+        return self
 
     def click(self, action_name: str = "click_fail", value=None, **kwargs):
             el = self.el(value, **kwargs)
@@ -80,6 +73,7 @@ class BasePage:
             except Exception as e:
                 self._fail_action(action_name)
                 raise e
+            return self
             
     def fill(self, text: str, action_name: str = "fill_fail", value=None, **kwargs):
         el = self.el(value, **kwargs)
@@ -89,6 +83,7 @@ class BasePage:
         except Exception as e:
             self._fail_action(action_name)
             raise e
+        return self
 
     def get_text(self, action_name: str = "get_text_fail", value=None, **kwargs) -> str:
         el = self.el(value, **kwargs)
@@ -106,18 +101,21 @@ class BasePage:
         self._ui_expect(el, action_name)(
             lambda e: expect(e).to_be_visible()
         )
+        return self
 
     def expect_text(self, text: str, action_name: str = "text_fail", value=None, **kwargs):
         el = self.el(value, **kwargs)
         self._ui_expect(el, action_name)(
             lambda e: expect(e).to_have_text(text)
         )
+        return self
 
     def expect_contains_text(self, text: str, action_name: str = "contain_text_fail", value=None, **kwargs):
         el = self.el(value, **kwargs)
         self._ui_expect(el, action_name)(
             lambda e: expect(e).to_contain_text(text)
         )
+        return self
 
         
     def _ui_expect(self, locator: Locator, action_name: str="ui_fail", full_page=False):
