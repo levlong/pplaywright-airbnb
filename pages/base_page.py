@@ -1,8 +1,12 @@
 import os
 import time
 from playwright.sync_api import Page, Locator, expect
+from utils.logger import get_logger
 
 class BasePage:
+
+    logger = get_logger(__name__)
+
     """
     BasePage cung cấp các hành động chung cho tất cả Page / Component.
 
@@ -18,43 +22,53 @@ class BasePage:
         self.page = page
     
     def el(self, value=None, **kwargs) -> Locator:
+        locator: Locator | None = None
+
         # Neu selector la xpath
         if value and isinstance(value, str):
             if value.startswith("//") or value.startswith("(//"):
-                return self.page.locator(value)
-            return self.page.get_by_text(value)
+                locator = self.page.locator(value)
+            else:
+                locator = self.page.get_by_text(value)
             
         # Lay locator theo role
-        if "role" in kwargs:
-            return self.page.get_by_role(
-                kwargs["role"], name=kwargs.get("name")
+        elif "role" in kwargs:
+            locator = self.page.get_by_role(
+                kwargs["role"], 
+                name=kwargs.get("name"),
+                checked=kwargs.get("checked", None)
             )
         
         # Lay locator theo text
-        if "text" in kwargs:
-            return self.page.get_by_text(kwargs["text"])
+        elif "text" in kwargs:
+            locator = self.page.get_by_text(kwargs.get("text"))
         
         # Lay locator theo label
-        if "label" in kwargs:
-            return self.page.get_by_label(kwargs["label"])
+        elif "label" in kwargs:
+            locator = self.page.get_by_label(kwargs.get("label"))
         
         # Lay locator theo placeholder
-        if "placeholder" in kwargs:
-            return self.page.get_by_placeholder(kwargs["placeholder"])
+        elif "placeholder" in kwargs:
+            locator = self.page.get_by_placeholder(kwargs.get("placeholder"))
         
         # Lay locator theo alt text
-        if "alt_text" in kwargs:
-            return self.page.get_by_alt_text(kwargs["alt_text"])
+        elif "alt_text" in kwargs:
+            locator = self.page.get_by_alt_text(kwargs.get("alt_text"))
         
         # Lay locator theo title
-        if "title" in kwargs:
-            return self.page.get_by_title(kwargs["title"])
+        elif "title" in kwargs:
+            locator = self.page.get_by_title(kwargs.get("title"))
         
         # Lay locator theo test id
-        if "test_id" in kwargs:
-            return self.page.get_by_test_id(kwargs["test_id"])
+        elif "test_id" in kwargs:
+            locator = self.page.get_by_test_id(kwargs.get("test_id"))
+        else:
+            raise ValueError(f"Unsupported selector {kwargs}")
 
-        raise ValueError(f"Unsupported selector {kwargs}")
+        if "has_text" in kwargs:
+            locator = locator.filter(has_text=kwargs.get("has_text"))
+
+        return locator
 
     def goto(self, url: str, name: str = "goto_fail", wait="domcontentloaded"):
         try:
@@ -103,17 +117,19 @@ class BasePage:
         )
         return self
 
-    def expect_text(self, text: str, action_name: str = "text_fail", value=None, **kwargs):
+    def expect_text(self, expected_text: str, action_name: str = "text_fail", value=None, **kwargs):
         el = self.el(value, **kwargs)
+        self.logger.info(el.inner_text())
         self._ui_expect(el, action_name)(
-            lambda e: expect(e).to_have_text(text)
+            lambda e: expect(e).to_have_text(expected_text)
         )
         return self
 
-    def expect_contains_text(self, text: str, action_name: str = "contain_text_fail", value=None, **kwargs):
+    def expect_contains_text(self, expected_text: str, action_name: str = "contain_text_fail", value=None, **kwargs):
         el = self.el(value, **kwargs)
+        self.logger.info(el.inner_text())
         self._ui_expect(el, action_name)(
-            lambda e: expect(e).to_contain_text(text)
+            lambda e: expect(e).to_contain_text(expected_text)
         )
         return self
 
