@@ -50,11 +50,18 @@ def page():
             base_url=BASE_URL
         )
 
+        context.tracing.start(
+            screenshots=True,
+            snapshots=True,
+            sources=True
+        )
+
         page = context.new_page()
         page.set_default_timeout(TIMEOUT)
 
         yield page
 
+        context.tracing.stop(path="reports/trace.zip")
         context.close()
         browser.close()
 
