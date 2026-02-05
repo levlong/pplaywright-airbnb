@@ -1,3 +1,4 @@
+import pytest
 from pages.login_page import LoginPage
 from components.side_bar_component import SideBarComponent
 
@@ -9,5 +10,5 @@ def test_valid_login(page):
                         .ensure_menu_open(menu_item="Entities")
                         .click_device()
                         .verify_device_page()
-                        .add_new_device("Drain valve 2", "Valve", "Customer A")
+                        .add_new_device("Drain valve", "Valve", "Customer A")
                 )

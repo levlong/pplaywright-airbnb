@@ -98,6 +98,16 @@ class BasePage:
             self._fail_action(action_name)
             raise e
         return self
+    
+    def type(self, text: str, action_name: str = "type_fail", value=None, **kwargs):
+        el = self.el(value, **kwargs)
+        try:
+            el.wait_for(state="visible")
+            el.type(text)
+        except Exception as e:
+            self._fail_action(action_name)
+            raise e
+        return self
 
     def get_text(self, action_name: str = "get_text_fail", value=None, **kwargs) -> str:
         el = self.el(value, **kwargs)
