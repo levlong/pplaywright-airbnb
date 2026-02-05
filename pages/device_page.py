@@ -1,6 +1,7 @@
 import shlex
 import json
 import requests
+import time
 from pages.base_page import BasePage
 from utils.logger import get_logger
 
@@ -33,7 +34,7 @@ class DevicePage(BasePage):
         return self
     
     def enter_device_name(self, device_name):
-        self.fill(device_name, action_name="Enter_device_name", **self.DEVICE_NAME)
+        self.type(device_name, action_name="Enter_device_name", **self.DEVICE_NAME)
         return self
     
     def enter_device_label(self, device_label):
@@ -109,9 +110,10 @@ class DevicePage(BasePage):
         self.logger.info("Device activated successfully via API")
     
     def add_new_device(self, device_name, device_label, user_name):
+        ts = int(time.time())
         self.click_add_device()
         self.click_add_new_device()
-        self.enter_device_name(device_name)
+        self.enter_device_name(f"{device_name}_{ts}")
         self.enter_device_label(device_label)
         self.assign_device_to_user(user_name)
         self.click(action_name="Click_add_new_device_button", **self.ADD_NEW_DEVICE_BUTTON)
@@ -129,16 +131,16 @@ class DevicePage(BasePage):
         self.click(action_name="Refresh_device_tab", **self.REFRESH_DEVICE_BUTTON)
 
         device_status = (f"//mat-row[.//mat-cell[contains(@class,'mat-column-name')]"
-                        f"//span[normalize-space()='{device_name}']]"
+                        f"//span[normalize-space()='{device_name}_{ts}']]"
                         f"//mat-cell[contains(@class,'mat-column-active')]"
                         f"//div[contains(@class,'status')]")
 
         self.expect_contains_text(expected_text="Active", action_name="Verify_device_status", value=device_status)
 
         self.expect_contains_text(
-            expected_text=device_name, 
+            expected_text=f"{device_name}_{ts}", 
             action_name="Verify_new_added_device", 
             role="cell", 
-            name=device_name)
+            name=f"{device_name}_{ts}")
 
         return self
