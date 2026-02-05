@@ -9,15 +9,34 @@ pipeline {
     cron('H 0 * * *')
   }
 
+  parameters {
+    booleanParam(name: 'ALLOW_RUN', defaultValue: false)
+  }
+
   stages {
+    stage('Gate Check') {
+    when {
+      expression { params.ALLOW_RUN }
+    }
+
+    steps {
+        echo 'Backend build SUCCESS → Autotest allowed'
+      }
+    }
 
     stage('Checkout') {
+      when {
+        expression { params.ALLOW_RUN }
+      }
       steps {
         checkout scm
       }
     }
 
     stage('Check python version') {
+        when {
+          expression { params.ALLOW_RUN }
+        }
         steps {
             sh '''
             python3 --version
@@ -26,6 +45,9 @@ pipeline {
     }
 
     stage('Setup venv') {
+      when {
+        expression { params.ALLOW_RUN }
+      }
       steps {
         sh '''
           set -e
@@ -39,6 +61,9 @@ pipeline {
     }
 
     stage('Install Playwright') {
+      when {
+        expression { params.ALLOW_RUN }
+      }
       steps {
         sh '''
           venv/bin/playwright install chromium
@@ -47,6 +72,9 @@ pipeline {
     }
 
     stage('Run tests') {
+      when {
+        expression { params.ALLOW_RUN }
+      }
       steps {
         sh '''
           venv/bin/pytest -v --html=reports/report.html --self-contained-html
