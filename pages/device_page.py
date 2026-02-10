@@ -20,6 +20,8 @@ class DevicePage(BasePage):
     REFRESH_DEVICE_BUTTON = {"role": "button", "has_text": "refresh"}
     DEVICE_STATUS         = "Active"
     API                   = "curl -v -X POST http://demo."
+    DELETE_DEVICE_BUTTON  = {"role": "button", "name": "delete"}
+    CONFIRM_DELETE_BUTTON = {"role": "button", "name": "Yes"}
 
     def verify_device_page(self):
         self.expect_contains_text(expected_text="Devices", action_name="verify_device_page", text=self.DEVICE_TITLE)
@@ -143,4 +145,23 @@ class DevicePage(BasePage):
             role="cell", 
             name=f"{device_name}_{ts}")
 
+        return self
+
+    def delete_device(self, device_name: str):
+        """Xóa một device dựa trên tên."""
+        # Hover device row để hiển thị action buttons
+        self.hover(action_name="Hover_device_row", role="row", has_text=device_name)
+        
+        # Get device row locator
+        device_row = self.el(role="row", has_text=device_name)
+        
+        # Find và click delete button trong row này
+        delete_btn = self.el(role="button", has_text="delete", base=device_row)
+        self.click(action_name=f"Click_delete_device_{device_name}", value=delete_btn)
+        
+        # Confirm deletion bằng nút "Yes"
+        self.click(action_name="Confirm_delete_device", **self.CONFIRM_DELETE_BUTTON)
+        
+        # Verify device was deleted
+        self.expect_hidden(action_name="Verify_device_deleted", role="cell", name=device_name)
         return self

@@ -1,5 +1,6 @@
 .pytest_cache
 .venv
+.vscode
 components/__pycache__
 pages/__pycache__
 reports/

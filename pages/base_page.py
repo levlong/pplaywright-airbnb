@@ -2,6 +2,13 @@ import os
 import time
 from playwright.sync_api import Page, Locator, expect
 from utils.logger import get_logger
+from typing import Literal, TypedDict, Optional, Union
+
+# Định nghĩa một Type cho các Role hợp lệ trong Playwright để AI gợi ý chuẩn
+RoleType = Literal[
+    "button", "checkbox", "combobox", "grid", "heading", "img", 
+    "link", "listbox", "menu", "meter", "radio", "textbox", "searchbox"
+]
 
 class BasePage:
 
@@ -21,52 +28,61 @@ class BasePage:
         """
         self.page = page
     
-    def el(self, value=None, **kwargs) -> Locator:
-        locator: Locator | None = None
+    def el(
+        self, 
+        value: Optional[Union[str, Locator]] = None, 
+        role: Optional[RoleType] = None,
+        name: Optional[Union[str, dict]] = None,
+        text: Optional[str] = None,
+        label: Optional[str] = None,
+        placeholder: Optional[str] = None,
+        alt_text: Optional[str] = None,
+        title: Optional[str] = None,
+        test_id: Optional[str] = None,
+        checked: Optional[bool] = None,
+        has_text: Optional[str] = None,
+        base: Optional[Locator] = None,
+        **kwargs
+    ) -> Locator:
+        """
+        Tìm kiếm Locator dựa trên các tham số được cung cấp.
+        Gợi ý: Luôn ưu tiên dùng test_id hoặc role để test bền vững hơn.
+        """
+        locator: Optional[Locator] = None
+        root = base if base else self.page
 
-        # Neu selector la xpath
+        # 0. Nếu value đã là Locator thì dùng luôn
+        if isinstance(value, Locator):
+            return value
+
+        # 1. Xpath hoặc Text thuần
         if value and isinstance(value, str):
             if value.startswith("//") or value.startswith("(//"):
-                locator = self.page.locator(value)
+                locator = root.locator(value)
             else:
-                locator = self.page.get_by_text(value)
-            
-        # Lay locator theo role
-        elif "role" in kwargs:
-            locator = self.page.get_by_role(
-                kwargs["role"], 
-                name=kwargs.get("name"),
-                checked=kwargs.get("checked", None)
-            )
+                locator = root.get_by_text(value)
         
-        # Lay locator theo text
-        elif "text" in kwargs:
-            locator = self.page.get_by_text(kwargs.get("text"))
-        
-        # Lay locator theo label
-        elif "label" in kwargs:
-            locator = self.page.get_by_label(kwargs.get("label"))
-        
-        # Lay locator theo placeholder
-        elif "placeholder" in kwargs:
-            locator = self.page.get_by_placeholder(kwargs.get("placeholder"))
-        
-        # Lay locator theo alt text
-        elif "alt_text" in kwargs:
-            locator = self.page.get_by_alt_text(kwargs.get("alt_text"))
-        
-        # Lay locator theo title
-        elif "title" in kwargs:
-            locator = self.page.get_by_title(kwargs.get("title"))
-        
-        # Lay locator theo test id
-        elif "test_id" in kwargs:
-            locator = self.page.get_by_test_id(kwargs.get("test_id"))
+        # 2. Locator theo chuẩn Playwright mới
+        elif role:
+            locator = root.get_by_role(role, name=name, checked=checked)
+        elif text:
+            locator = root.get_by_text(text)
+        elif label:
+            locator = root.get_by_label(label)
+        elif placeholder:
+            locator = root.get_by_placeholder(placeholder)
+        elif alt_text:
+            locator = root.get_by_alt_text(alt_text)
+        elif title:
+            locator = root.get_by_title(title)
+        elif test_id:
+            locator = root.get_by_test_id(test_id)
         else:
-            raise ValueError(f"Unsupported selector {kwargs}")
+            raise ValueError(f"Ít nhất một selector phải được cung cấp. Nhận được: {kwargs}")
 
-        if "has_text" in kwargs:
-            locator = locator.filter(has_text=kwargs.get("has_text"))
+        # 3. Filter bổ trợ
+        if has_text:
+            locator = locator.filter(has_text=has_text)
 
         return locator
 
@@ -117,6 +133,16 @@ class BasePage:
         except Exception as e:
             self._fail_action(action_name)
             raise e
+
+    def hover(self, action_name: str = "hover_fail", value=None, **kwargs):
+        el = self.el(value, **kwargs)
+        try:
+            el.wait_for(state="visible")
+            el.hover()
+        except Exception as e:
+            self._fail_action(action_name)
+            raise e
+        return self
     
     # ================= ASSERTIONS =================
 
@@ -143,6 +169,12 @@ class BasePage:
         )
         return self
 
+    def expect_hidden(self, action_name: str = "hidden_fail", value=None, **kwargs):
+        el = self.el(value, **kwargs)
+        self._ui_expect(el, action_name)(
+            lambda e: expect(e).to_be_hidden()
+        )
+        return self
         
     def _ui_expect(self, locator: Locator, action_name: str="ui_fail", full_page=False):
         """
